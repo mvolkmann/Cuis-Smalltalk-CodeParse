@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 6:07:42 am'!
+'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 6:58:44 am'!
 'Description '!
-!provides: 'CodeParse' 1 2!
+!provides: 'CodeParse' 1 6!
 SystemOrganization addCategory: 'CodeParse'!
 
 
@@ -29,18 +29,107 @@ TypeCheck class
 initialize
 	IndentDict := Dictionary new.! !
 
-!ParseTree class methodsFor: 'printing' stamp: 'RMV 11/30/2024 09:14:37'!
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 06:50:44'!
+example1
+	| code |
+
+	code := 'sumNumber: n1 and: n2
+	"Answer sum of n1 and n2."
+	^ n1 + n2'.
+
+	ParseTree initialize.
+	Transcript clear.
+	ParseTree printCode: code.
+! !
+
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 06:53:28'!
+example2
+	"Demonstrate all three message types."
+	| code |
+
+	code := 'demo
+	| interval n |
+	n := 19.
+	n print.
+	n := n * 2.
+	interval := 1 to: 10 by: 2.
+	interval print.'.
+
+	ParseTree initialize.
+	Transcript clear.
+	ParseTree printCode: code.
+! !
+
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 06:54:23'!
+example3
+	"Demonstrate a message that takes a block."
+	| code |
+
+	code := 'sumNumber: aSeq
+	"Answer sum of numbers in aSeq."
+	| sum |
+	sum := aSeq fold: [:acc :n | acc + n].
+	sum := sum + 1.
+	^sum.'.
+
+	ParseTree initialize.
+	Transcript clear.
+	ParseTree printCode: code.
+! !
+
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 06:55:17'!
+example4
+	"Demonstrate an assignment with multiple binary messages."
+	| code |
+
+	code := 'rectangleAreaWidth: widthNumber height: heightNumber
+	"Answer the area of a rectangle."
+	| area doubleHeight doubleWidth sum |
+
+	"This demonstrates using backticks for a compile-time expression."
+	sum := `2 + 3`.
+
+	area := widthNumber * heightNumber.
+	doubleWidth := self double: widthNumber.
+	doubleHeight := self double: heightNumber.
+	area := doubleWidth * doubleHeight * 2.
+	^ area.'.
+
+	ParseTree initialize.
+	Transcript clear.
+	ParseTree printCode: code.
+! !
+
+!ParseTree class methodsFor: 'printing' stamp: 'RMV 12/1/2024 06:09:26'!
 printCode: aString
 	| parseNode parser stream |
 
 	parser := Parser new.
 	parseNode := parser parse: aString class: ParseTree.
-
-	"Generate indentation string based on the current level"
-	"indentation := String new: indentLevel * 4 withAll: Character space."
-
 	stream := WriteStream on: (String new: 300).
 	parseNode printOn: stream depth: 0.
+	stream contents print.! !
+
+!ParseTree class methodsFor: 'printing' stamp: 'RMV 12/1/2024 06:58:33'!
+printCodeBasic: aString
+	"Demonstrate printing a parse tree only using provided classes.
+	Do not add indentation to indicate the depth of each node in the parse tree.
+	Check for specific ParseNode subclasses
+	in order to print information specific to that class
+	(as is done above for the `MethodNode` class)."
+	| enumerator parseNode parser stream |
+
+	parser := Parser new.
+	parseNode := parser parse: aString class: ParseTree.
+	stream := WriteStream on: (String new: 300).
+	enumerator := ParseNodeEnumerator ofBlock: [:node |
+		stream nextPutAll: node class name; nextPutAll: ': '.
+		node isMethodNode
+			ifTrue: [ node printSelectorAndArgumentsOn: stream ]
+			ifFalse: [ stream nextPutAll: node printSourceCode ].
+		stream newLine.
+	].
+	parseNode accept: enumerator.
 	stream contents print.! !
 
 !ParseTree class methodsFor: 'private' stamp: 'RMV 11/30/2024 16:37:16'!
@@ -378,13 +467,12 @@ printOn: aStream depth: aNumber
 		nextPutAll: self name;
 		newLine.! !
 
-!MessageNode methodsFor: '*CodeParse' stamp: 'RMV 11/30/2024 19:12:53'!
+!MessageNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 06:51:29'!
 printOn: aStream depth: aNumber
 	| indent indentNext type |
 
 	indent := ParseTree indentDepth: aNumber.
 	indentNext := ParseTree indentDepth: aNumber + 1.
-	receiver class name logAs: 'receiver class name'.
 	
 	type := precedence caseOf: { [1] -> ['unary']. [2] -> ['binary']. [3] -> ['keyword'] }.
 	aStream nextPutAll: indent; nextPutAll: type, ' message:'; newLine.
