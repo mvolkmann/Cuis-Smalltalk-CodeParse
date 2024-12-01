@@ -15,7 +15,7 @@ The argument is a string of Smalltalk code.
   This can be used to transform Smalltalk code into different code,
   possibly in another programming language.
 
-## Isn't there an easier way that is built-in?
+## Isn't there an easier, builtsin way
 
 Well ... sort of. You could do something like this:
 
@@ -38,7 +38,8 @@ printCodeBasic: aString
 	stream contents print.
 ```
 
-But this does not add indentation to indicate the depth of each node in the parse tree.
+But this does not add indentation to indicate
+the depth of each node in the parse tree.
 It also requires testing for each `ParseNode` subclass
 for which we want to output information specific to that class
 (as is done above for the `MethodNode` class).
