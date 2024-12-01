@@ -51,15 +51,8 @@ for which output should be specific to that class
 
 ## Examples
 
-Try evaluating the following in a Workspace:
-
-```smalltalk
-ParseTree example1
-ParseTree example2
-ParseTree example3
-ParseTree example4
-ParseTree example5
-```
+Try evaluating `ParseTree example{n}` in a Workspace
+where `{n}` is replaced by a number from 1 to 6.
 
 ## Compatibility with Other Smalltalks
 

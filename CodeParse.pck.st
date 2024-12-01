@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 8:12:33 am'!
+'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 8:39:43 am'!
 'Description '!
-!provides: 'CodeParse' 1 10!
+!provides: 'CodeParse' 1 12!
 SystemOrganization addCategory: #CodeParse!
 
 
@@ -105,6 +105,24 @@ example5
 	ParseTree printNonMethodCode: code.
 ! !
 
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 08:27:46'!
+example6
+	"Demonstrate a cascade."
+	| code |
+
+	code := 'demoStream: aStream
+	aStream
+		nextPutAll: ''Hello'';
+		nextPut: $,;
+		nextPutAll: ''World!!'';
+		newLine
+	'.
+
+	ParseTree initialize.
+	Transcript clear.
+	ParseTree printMethodCode: code.
+! !
+
 !ParseTree class methodsFor: 'printing' stamp: 'RMV 12/1/2024 06:58:33'!
 printCodeBasic: aString
 	"Demonstrate printing a parse tree only using provided classes.
@@ -202,6 +220,30 @@ printOn: aStream depth: aNumber
 		].
 	].! !
 
+!CascadeNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 08:31:29'!
+printOn: aStream depth: aNumber
+	| indent indentNext |
+
+	indent := ParseTree indentDepth: aNumber.
+	indentNext := ParseTree indentDepth: aNumber + 1.
+
+	aStream nextPutAll: indent; nextPutAll: 'cascade:'; newLine.
+
+	aStream nextPutAll: indentNext; nextPutAll: 'receiver:'.
+	receiver isMessageNode
+		ifTrue: [
+			aStream newLine.
+			receiver printOn: aStream depth: aNumber + 2
+		]
+		ifFalse: [
+			aStream space; nextPutAll: receiver name; newLine.
+		].
+
+	messages do: [:message |
+		message printOn: aStream depth: aNumber + 1
+	].
+! !
+
 !BlockNode methodsFor: '*CodeParse' stamp: 'RMV 11/30/2024 15:58:17'!
 printOn: aStream depth: aNumber
 	| indent indentNext |
@@ -260,12 +302,18 @@ printOn: aStream depth: aNumber
 	].
 ! !
 
-!LeafNode methodsFor: '*CodeParse' stamp: 'RMV 11/30/2024 18:43:27'!
+!LeafNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 08:39:30'!
 printOn: aStream depth: aNumber
 	| indent text |
 
 	indent := ParseTree indentDepth: aNumber.
-	text := key isString ifTrue: ['''', key, ''''] ifFalse: [key asString].
+	text := key isString
+		ifTrue: ['String ''', key, '''']
+		ifFalse: [
+			key isCharacter
+				ifTrue: ['Character $', key asString]
+				ifFalse: [key asString]
+		].
 	
 	aStream
 		nextPutAll: indent;
@@ -292,7 +340,7 @@ printOn: aStream depth: aNumber
 		nextPutAll: self name;
 		newLine.! !
 
-!MessageNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 06:51:29'!
+!MessageNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 08:34:48'!
 printOn: aStream depth: aNumber
 	| indent indentNext type |
 
@@ -302,15 +350,18 @@ printOn: aStream depth: aNumber
 	type := precedence caseOf: { [1] -> ['unary']. [2] -> ['binary']. [3] -> ['keyword'] }.
 	aStream nextPutAll: indent; nextPutAll: type, ' message:'; newLine.
 	
-	aStream nextPutAll: indentNext; nextPutAll: 'receiver:'.
-	receiver isMessageNode
-		ifTrue: [
-			aStream newLine.
-			receiver printOn: aStream depth: aNumber + 2
-		]
-		ifFalse: [
-			aStream space; nextPutAll: receiver name; newLine.
-		].
+	"receiver is nil in cascade messages"
+	receiver ifNotNil: [
+		aStream nextPutAll: indentNext; nextPutAll: 'receiver:'.
+		receiver isMessageNode
+			ifTrue: [
+				aStream newLine.
+				receiver printOn: aStream depth: aNumber + 2
+			]
+			ifFalse: [
+				aStream space; nextPutAll: receiver name; newLine.
+			].
+	].
 
 	aStream nextPutAll: indentNext; nextPutAll: 'selector: #'; nextPutAll: selector key; newLine.
 	
