@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 10:07:58 am'!
+'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 10:49:51 am'!
 'Description '!
-!provides: 'CodeParse' 1 17!
+!provides: 'CodeParse' 1 18!
 SystemOrganization addCategory: #CodeParse!
 
 
@@ -290,7 +290,7 @@ printOn: aStream depth: aNumber
 	].
 ! !
 
-!BlockNode methodsFor: '*CodeParse' stamp: 'RMV 11/30/2024 15:58:17'!
+!BlockNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 10:49:48'!
 printOn: aStream depth: aNumber
 	| indent indentNext |
 
