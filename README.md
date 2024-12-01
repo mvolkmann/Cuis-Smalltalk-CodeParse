@@ -54,6 +54,54 @@ for which output should be specific to that class
 Try evaluating `ParseTree example{n}` in a Workspace
 where `{n}` is replaced by a number from 1 to 6.
 
+`example2` parses the following code:
+
+```smalltalk
+demo
+    | interval n |
+    n := 19.
+    n print.
+    n := n * 2.
+    interval := 1 to: 10 by: 2.
+    interval print.
+```
+
+It produces the following output:
+
+```text
+method: demo
+    temporary variables: | interval n |
+    assignment:
+        variable: n
+        value:
+            literal 19
+    unary message:
+        receiver: n
+        selector: #print
+    assignment:
+        variable: n
+        value:
+            binary message:
+                receiver: n
+                selector: #*
+                argument:
+                    literal 2
+    assignment:
+        variable: interval
+        value:
+            keyword message:
+                receiver: 1
+                selector: #to:by:
+                arguments:
+                    literal 10
+                    literal 2
+    unary message:
+        receiver: interval
+        selector: #print
+    return:
+        variable String 'self'
+```
+
 ## Compatibility with Other Smalltalks
 
 This package is not compatible with Squeak Smalltalk

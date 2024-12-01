@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 9:10:06 am'!
+'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 10:07:58 am'!
 'Description '!
-!provides: 'CodeParse' 1 13!
+!provides: 'CodeParse' 1 17!
 SystemOrganization addCategory: #CodeParse!
 
 
@@ -50,17 +50,16 @@ example2
 	ParseTree printMethodCode: code.
 ! !
 
-!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 08:10:38'!
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 10:03:50'!
 example3
 	"Demonstrate a message that takes a block."
 	| code |
 
-	code := 'sumNumber: aSeq
-	"Answer sum of numbers in aSeq."
+	code := 'doubleSumNumbers: aSeq
+	"Answer double the sum of numbers in aSeq"
 	| sum |
 	sum := aSeq fold: [:acc :n | acc + n].
-	sum := sum + 1.
-	^sum.'.
+	^sum * 2'.
 
 	ParseTree initialize.
 	Transcript clear.
@@ -90,23 +89,8 @@ example4
 	ParseTree printMethodCode: code.
 ! !
 
-!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 08:11:27'!
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 09:35:41'!
 example5
-	"Demonstrate an assignment with multiple binary messages."
-	| code |
-
-	code := '| a b c |
-	b := 1.
-	c := 2.
-	a := b + c'.
-
-	ParseTree initialize.
-	Transcript clear.
-	ParseTree printNonMethodCode: code.
-! !
-
-!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 08:27:46'!
-example6
 	"Demonstrate a cascade."
 	| code |
 
@@ -121,6 +105,33 @@ example6
 	ParseTree initialize.
 	Transcript clear.
 	ParseTree printMethodCode: code.
+! !
+
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 09:36:57'!
+example6
+	"Demonstrate an assignment with multiple binary messages."
+	| code |
+
+	code := '| a b c |
+	b := 1.
+	c := 2.
+	a := b + c'.
+
+	ParseTree initialize.
+	Transcript clear.
+	ParseTree printNonMethodCode: code.
+! !
+
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 09:36:06'!
+example7
+	"Demonstrate an assignment with multiple binary messages."
+	| code |
+
+	code := 'b := 1. c := 2. a := b + c'.
+
+	ParseTree initialize.
+	Transcript clear.
+	ParseTree printNonMethodCode: code.
 ! !
 
 !ParseTree class methodsFor: 'printing' stamp: 'RMV 12/1/2024 06:58:33'!
@@ -302,7 +313,7 @@ printOn: aStream depth: aNumber
 	statements do: [:statement | statement printOn: aStream depth: aNumber + 1].
 ! !
 
-!MethodNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 07:13:03'!
+!MethodNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 09:49:37'!
 printOn: aStream depth: aNumber
 	| indent indentNext |
 
@@ -359,14 +370,6 @@ printOn: aStream depth: aNumber
 		nextPutAll: text;
 		newLine.! !
 
-!VariableNode methodsFor: '*CodeParse' stamp: 'RMV 11/30/2024 18:43:17'!
-printOn: aStream depth: aNumber
-	aStream
-		nextPutAll: (ParseTree indentDepth: aNumber);
-		nextPutAll: 'variable: ';
-		nextPutAll: name;
-		newLine.! !
-
 !TempVariableNode methodsFor: '*CodeParse' stamp: 'RMV 11/30/2024 16:17:24'!
 printOn: aStream depth: aNumber
 	| indent |
@@ -378,9 +381,9 @@ printOn: aStream depth: aNumber
 		nextPutAll: self name;
 		newLine.! !
 
-!MessageNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 08:34:48'!
+!MessageNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 10:07:18'!
 printOn: aStream depth: aNumber
-	| indent indentNext type |
+	| indent indentNext name suffix type |
 
 	indent := ParseTree indentDepth: aNumber.
 	indentNext := ParseTree indentDepth: aNumber + 1.
@@ -397,14 +400,16 @@ printOn: aStream depth: aNumber
 				receiver printOn: aStream depth: aNumber + 2
 			]
 			ifFalse: [
-				aStream space; nextPutAll: receiver name; newLine.
+				name := receiver isLiteralNode ifTrue: [receiver key asString] ifFalse: [receiver name].
+				aStream space; nextPutAll: name; newLine.
 			].
 	].
 
 	aStream nextPutAll: indentNext; nextPutAll: 'selector: #'; nextPutAll: selector key; newLine.
 	
 	arguments ifNotEmpty: [
-		aStream nextPutAll: indentNext; nextPutAll: 'arguments:'; newLine.
+		suffix := arguments size = 1 ifTrue: [''] ifFalse: ['s'].
+		aStream nextPutAll: indentNext; nextPutAll: 'argument', suffix, ':'; newLine.
 		arguments do: [:argument |
 			argument printOn: aStream depth: aNumber + 2.
 		]
