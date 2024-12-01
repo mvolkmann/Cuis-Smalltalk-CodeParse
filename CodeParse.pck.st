@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 8:39:43 am'!
+'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 9:10:06 am'!
 'Description '!
-!provides: 'CodeParse' 1 12!
+!provides: 'CodeParse' 1 13!
 SystemOrganization addCategory: #CodeParse!
 
 
@@ -168,6 +168,19 @@ printNonMethodCode: aString
 	parseNode printOn: stream depth: 0.
 	stream contents print.! !
 
+!ParseTree class methodsFor: 'private' stamp: 'RMV 12/1/2024 08:58:34'!
+convertToReadableString: aString [
+    | result |
+    result := ''.
+    aString withIndexDo: [:char :index |
+        (char isUppercase and: [index > 1]) ifTrue: [
+            result := result, ' '.
+        ].
+        result := result, char asLowercase.
+    ].
+    ^result.
+]! !
+
 !ParseTree class methodsFor: 'private' stamp: 'RMV 12/1/2024 07:15:47'!
 indentDepth: aNumber
 	IndentDict ifNil: [ Error signal: 'ParseTree class not initialized' ].
@@ -175,6 +188,28 @@ indentDepth: aNumber
 		String new: aNumber * 4 withAll: Character space.
 	]
 ! !
+
+!ParseTree class methodsFor: 'private' stamp: 'RMV 12/1/2024 09:04:25'!
+wordsFromCamelCase: aString
+	| stream |
+	stream := WriteStream on: (String new: 100).
+	stream nextPut: aString first asLowercase.
+	aString allButFirst do: [:char |
+		char isUppercase ifTrue: [ stream space ].
+		stream nextPut: char asLowercase.
+	].
+	^stream contents.! !
+
+!String methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 09:05:26'!
+wordsFromCamelCase
+	| stream |
+	stream := WriteStream on: (String new: 100).
+	stream nextPut: self first asLowercase.
+	self allButFirst do: [:char |
+		char isUppercase ifTrue: [ stream space ].
+		stream nextPut: char asLowercase.
+	].
+	^stream contents.! !
 
 !ParseNode methodsFor: '*CodeParse' stamp: 'RMV 11/30/2024 16:10:49'!
 printOn: aStream depth: aNumber
@@ -302,11 +337,13 @@ printOn: aStream depth: aNumber
 	].
 ! !
 
-!LeafNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 08:39:30'!
+!LeafNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 09:09:55'!
 printOn: aStream depth: aNumber
-	| indent text |
+	| label text |
+	
+	"Using allButLast: 4 removes the word 'Node' from the end of the class name."
+	label := self class name allButLast: 4 :: wordsFromCamelCase.
 
-	indent := ParseTree indentDepth: aNumber.
 	text := key isString
 		ifTrue: ['String ''', key, '''']
 		ifFalse: [
@@ -316,8 +353,9 @@ printOn: aStream depth: aNumber
 		].
 	
 	aStream
-		nextPutAll: indent;
-		nextPutAll: 'leaf: ';
+		nextPutAll: (ParseTree indentDepth: aNumber);
+		nextPutAll: label;
+		space;
 		nextPutAll: text;
 		newLine.! !
 
