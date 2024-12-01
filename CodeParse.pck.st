@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 5:52:12 am'!
+'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 6:07:42 am'!
 'Description '!
-!provides: 'CodeParse' 1 1!
+!provides: 'CodeParse' 1 2!
 SystemOrganization addCategory: 'CodeParse'!
 
 
@@ -25,18 +25,11 @@ TypeCheck class
 	instanceVariableNames: ''!
 
 
-!ParseTree class methodsFor: 'as yet unclassified' stamp: 'RMV 11/30/2024 16:37:16'!
-indentDepth: aNumber
-	^ IndentDict at: aNumber ifAbsentPut: [
-		String new: aNumber * 4 withAll: Character space.
-	]
-! !
-
-!ParseTree class methodsFor: 'as yet unclassified' stamp: 'RMV 11/30/2024 16:26:52'!
+!ParseTree class methodsFor: 'class initialization' stamp: 'RMV 11/30/2024 16:26:52'!
 initialize
 	IndentDict := Dictionary new.! !
 
-!ParseTree class methodsFor: 'as yet unclassified' stamp: 'RMV 11/30/2024 09:14:37'!
+!ParseTree class methodsFor: 'printing' stamp: 'RMV 11/30/2024 09:14:37'!
 printCode: aString
 	| parseNode parser stream |
 
@@ -49,6 +42,13 @@ printCode: aString
 	stream := WriteStream on: (String new: 300).
 	parseNode printOn: stream depth: 0.
 	stream contents print.! !
+
+!ParseTree class methodsFor: 'private' stamp: 'RMV 11/30/2024 16:37:16'!
+indentDepth: aNumber
+	^ IndentDict at: aNumber ifAbsentPut: [
+		String new: aNumber * 4 withAll: Character space.
+	]
+! !
 
 !TypeCheck class methodsFor: 'accessing' stamp: 'RMV 11/24/2024 18:21:02'!
 disable
