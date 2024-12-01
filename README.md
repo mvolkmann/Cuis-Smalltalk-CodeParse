@@ -54,3 +54,12 @@ ParseTree example2
 ParseTree example3
 ParseTree example4
 ```
+
+## Compatibility with Other Smalltalks
+
+This package is not compatible with Squeak Smalltalk
+because it adds a method to the `BacktickNode` class
+which is not provided in Squeak.
+
+This package is not compatible with Pharo Smalltalk because
+Pharo does not provide the `ParseNode` class or its many subclasses.
