@@ -1,16 +1,16 @@
-'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 7:41:35 am'!
+'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 8:12:33 am'!
 'Description '!
-!provides: 'CodeParse' 1 9!
-SystemOrganization addCategory: 'CodeParse'!
+!provides: 'CodeParse' 1 10!
+SystemOrganization addCategory: #CodeParse!
 
 
-!classDefinition: #ParseTree category: 'CodeParse'!
+!classDefinition: #ParseTree category: #CodeParse!
 Object subclass: #ParseTree
 	instanceVariableNames: ''
 	classVariableNames: 'IndentDict'
 	poolDictionaries: ''
 	category: 'CodeParse'!
-!classDefinition: 'ParseTree class' category: 'CodeParse'!
+!classDefinition: 'ParseTree class' category: #CodeParse!
 ParseTree class
 	instanceVariableNames: ''!
 
@@ -19,7 +19,7 @@ ParseTree class
 initialize
 	IndentDict := Dictionary new.! !
 
-!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 06:50:44'!
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 08:10:28'!
 example1
 	| code |
 
@@ -29,10 +29,10 @@ example1
 
 	ParseTree initialize.
 	Transcript clear.
-	ParseTree printCode: code.
+	ParseTree printMethodCode: code.
 ! !
 
-!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 06:53:28'!
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 08:10:33'!
 example2
 	"Demonstrate all three message types."
 	| code |
@@ -47,10 +47,10 @@ example2
 
 	ParseTree initialize.
 	Transcript clear.
-	ParseTree printCode: code.
+	ParseTree printMethodCode: code.
 ! !
 
-!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 06:54:23'!
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 08:10:38'!
 example3
 	"Demonstrate a message that takes a block."
 	| code |
@@ -64,10 +64,10 @@ example3
 
 	ParseTree initialize.
 	Transcript clear.
-	ParseTree printCode: code.
+	ParseTree printMethodCode: code.
 ! !
 
-!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 06:55:17'!
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 08:10:46'!
 example4
 	"Demonstrate an assignment with multiple binary messages."
 	| code |
@@ -87,18 +87,23 @@ example4
 
 	ParseTree initialize.
 	Transcript clear.
-	ParseTree printCode: code.
+	ParseTree printMethodCode: code.
 ! !
 
-!ParseTree class methodsFor: 'printing' stamp: 'RMV 12/1/2024 06:09:26'!
-printCode: aString
-	| parseNode parser stream |
+!ParseTree class methodsFor: 'examples' stamp: 'RMV 12/1/2024 08:11:27'!
+example5
+	"Demonstrate an assignment with multiple binary messages."
+	| code |
 
-	parser := Parser new.
-	parseNode := parser parse: aString class: ParseTree.
-	stream := WriteStream on: (String new: 300).
-	parseNode printOn: stream depth: 0.
-	stream contents print.! !
+	code := '| a b c |
+	b := 1.
+	c := 2.
+	a := b + c'.
+
+	ParseTree initialize.
+	Transcript clear.
+	ParseTree printNonMethodCode: code.
+! !
 
 !ParseTree class methodsFor: 'printing' stamp: 'RMV 12/1/2024 06:58:33'!
 printCodeBasic: aString
@@ -120,6 +125,29 @@ printCodeBasic: aString
 		stream newLine.
 	].
 	parseNode accept: enumerator.
+	stream contents print.! !
+
+!ParseTree class methodsFor: 'printing' stamp: 'RMV 12/1/2024 08:08:32'!
+printMethodCode: aString
+	"Print the parse tree for a String that contains a method definition to the Transcript."
+	| parseNode parser stream |
+
+	parser := Parser new.
+	parseNode := parser parse: aString class: ParseTree.
+	stream := WriteStream on: (String new: 300).
+	parseNode printOn: stream depth: 0.
+	stream contents print.! !
+
+!ParseTree class methodsFor: 'printing' stamp: 'RMV 12/1/2024 08:10:03'!
+printNonMethodCode: aString
+	"Print the parse tree for a String that contains code that
+	does not begin with a method header to the Transcript."
+	| parseNode parser stream |
+
+	parser := Parser new.
+	parseNode := parser parse: aString class: ParseTree noPattern: true.
+	stream := WriteStream on: (String new: 300).
+	parseNode printOn: stream depth: 0.
 	stream contents print.! !
 
 !ParseTree class methodsFor: 'private' stamp: 'RMV 12/1/2024 07:15:47'!
