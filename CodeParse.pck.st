@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 10:49:51 am'!
+'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 10:51:28 am'!
 'Description '!
-!provides: 'CodeParse' 1 18!
+!provides: 'CodeParse' 1 19!
 SystemOrganization addCategory: #CodeParse!
 
 
@@ -222,9 +222,8 @@ wordsFromCamelCase
 	].
 	^stream contents.! !
 
-!ParseNode methodsFor: '*CodeParse' stamp: 'RMV 11/30/2024 16:10:49'!
+!ParseNode methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 10:51:05'!
 printOn: aStream depth: aNumber
-	self halt.
 	aStream
 		nextPutAll: (ParseTree indentDepth: aNumber);
 		nextPutAll: self class name;
