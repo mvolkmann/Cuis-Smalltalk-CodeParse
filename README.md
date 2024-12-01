@@ -22,20 +22,20 @@ Well ... sort of. You could do something like this:
 ```smalltalk
 
 printCodeBasic: aString
-	| enumerator parseNode parser stream |
+    | enumerator parseNode parser stream |
 
-	parser := Parser new.
-	parseNode := parser parse: aString class: ParseTree.
-	stream := WriteStream on: (String new: 300).
-	enumerator := ParseNodeEnumerator ofBlock: [:node |
-		stream nextPutAll: node class name; nextPutAll: ': '.
-		node isMethodNode
-			ifTrue: [ node printSelectorAndArgumentsOn: stream ]
-			ifFalse: [ stream nextPutAll: node printSourceCode ].
-		stream newLine.
-	].
-	parseNode accept: enumerator.
-	stream contents print.
+    parser := Parser new.
+    parseNode := parser parse: aString class: ParseTree.
+    stream := WriteStream on: (String new: 300).
+    enumerator := ParseNodeEnumerator ofBlock: [:node |
+        stream nextPutAll: node class name; nextPutAll: ': '.
+        node isMethodNode
+            ifTrue: [ node printSelectorAndArgumentsOn: stream ]
+            ifFalse: [ stream nextPutAll: node printSourceCode ].
+        stream newLine.
+    ].
+    parseNode accept: enumerator.
+    stream contents print.
 ```
 
 But this does not add indentation to indicate
