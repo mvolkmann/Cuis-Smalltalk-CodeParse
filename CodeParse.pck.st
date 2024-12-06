@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 5 December 2024 at 7:01:09 pm'!
+'From Cuis7.1 [latest update: #6876] on 6 December 2024 at 6:28:57 am'!
 'Description '!
-!provides: 'CodeParse' 1 20!
+!provides: 'CodeParse' 1 22!
 SystemOrganization addCategory: #CodeParse!
 
 
@@ -209,7 +209,7 @@ wordsFromCamelCase: aString
 	].
 	^stream contents.! !
 
-!Object methodsFor: '*CodeParse' stamp: 'RMV 12/5/2024 15:24:49'!
+!Object methodsFor: '*CodeParse' stamp: 'RMV 12/6/2024 06:28:56'!
 memoize: aBlock
 	| cache cacheKey sender valueKey |
 	
@@ -217,12 +217,24 @@ memoize: aBlock
 	
 	"Smalltalk is a SystemDictionary which is an IdentityDictionary.
 	That is why cacheKey must be a Symbol."
-	cacheKey := ('cache-', sender name) asSymbol.
+	"TODO: Should cacheKey include 'sender receiver'?"
+	cacheKey := ('memo-', sender name) asSymbol.
 
 	cache := Smalltalk at: cacheKey ifAbsentPut: [ IdentityDictionary new ].
 	valueKey := thisContext name, sender arguments asString :: asSymbol.
 
 	^ cache at: valueKey ifAbsentPut: [ aBlock value ].! !
+
+!Object class methodsFor: '*CodeParse' stamp: 'RMV 12/6/2024 06:12:34'!
+clearMemo: aString
+	"Delete all memoized entries from Smalltalk Dictionary whose keys
+	begin with 'memo-' followed by a given string."
+	| prefix |
+	
+	prefix := 'memo-', aString.
+	Smalltalk keys do: [ :key |
+		key isSymbol and: [key asString beginsWith: prefix] :: ifTrue: [ Smalltalk removeKey: key ].
+	].! !
 
 !String methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 09:05:26'!
 wordsFromCamelCase
