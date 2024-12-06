@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 1 December 2024 at 10:51:28 am'!
+'From Cuis7.1 [latest update: #6876] on 5 December 2024 at 7:01:09 pm'!
 'Description '!
-!provides: 'CodeParse' 1 19!
+!provides: 'CodeParse' 1 20!
 SystemOrganization addCategory: #CodeParse!
 
 
@@ -192,13 +192,11 @@ convertToReadableString: aString [
     ^result.
 ]! !
 
-!ParseTree class methodsFor: 'private' stamp: 'RMV 12/1/2024 07:15:47'!
+!ParseTree class methodsFor: 'private' stamp: 'RMV 12/5/2024 19:00:11'!
 indentDepth: aNumber
-	IndentDict ifNil: [ Error signal: 'ParseTree class not initialized' ].
-	^ IndentDict at: aNumber ifAbsentPut: [
+	^ self memoize: [
 		String new: aNumber * 4 withAll: Character space.
-	]
-! !
+	]! !
 
 !ParseTree class methodsFor: 'private' stamp: 'RMV 12/1/2024 09:04:25'!
 wordsFromCamelCase: aString
@@ -210,6 +208,21 @@ wordsFromCamelCase: aString
 		stream nextPut: char asLowercase.
 	].
 	^stream contents.! !
+
+!Object methodsFor: '*CodeParse' stamp: 'RMV 12/5/2024 15:24:49'!
+memoize: aBlock
+	| cache cacheKey sender valueKey |
+	
+	sender := thisContext sender.
+	
+	"Smalltalk is a SystemDictionary which is an IdentityDictionary.
+	That is why cacheKey must be a Symbol."
+	cacheKey := ('cache-', sender name) asSymbol.
+
+	cache := Smalltalk at: cacheKey ifAbsentPut: [ IdentityDictionary new ].
+	valueKey := thisContext name, sender arguments asString :: asSymbol.
+
+	^ cache at: valueKey ifAbsentPut: [ aBlock value ].! !
 
 !String methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 09:05:26'!
 wordsFromCamelCase
