@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6876] on 8 December 2024 at 7:02:53 pm'!
+'From Cuis7.1 [latest update: #6876] on 8 December 2024 at 7:07:06 pm'!
 'Description '!
-!provides: 'CodeParse' 1 24!
+!provides: 'CodeParse' 1 25!
 SystemOrganization addCategory: #CodeParse!
 
 
@@ -475,15 +475,18 @@ lookupClassImplementingSelector: selectorSymbol
 	].
 	^ nil! !
 
-!Integer methodsFor: '*CodeParse' stamp: 'RMV 12/8/2024 16:48:10'!
+!Integer methodsFor: '*CodeParse' stamp: 'RMV 12/8/2024 19:06:43'!
 fibonacci
+	"Answer fibonacci number for self."
 
 	self = 0 ifTrue: [ ^0 ].
 	self = 1 ifTrue: [ ^1 ].
 	^ (self - 1) fibonacci + (self - 2) fibonacci.! !
 
-!Integer class methodsFor: '*CodeParse' stamp: 'RMV 12/8/2024 17:08:29'!
+!Integer class methodsFor: '*CodeParse' stamp: 'RMV 12/8/2024 19:07:02'!
 fibonacci: anInteger
+	"Answer fibonacci number for anInteger."
+
 	^ self memoize: [
 		anInteger = 0 ifTrue: [ 0 ]
 		ifFalse: [ anInteger = 1 ifTrue: [ 1 ]
