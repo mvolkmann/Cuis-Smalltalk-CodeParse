@@ -1,6 +1,7 @@
-'From Cuis7.1 [latest update: #6876] on 8 December 2024 at 7:07:06 pm'!
+'From Cuis7.1 [latest update: #6883] on 10 December 2024 at 6:42:57 pm'!
 'Description '!
-!provides: 'CodeParse' 1 25!
+!provides: 'CodeParse' 1 27!
+!requires: 'Memoize' 1 1 nil!
 SystemOrganization addCategory: #CodeParse!
 
 
@@ -192,12 +193,6 @@ convertToReadableString: aString [
     ^result.
 ]! !
 
-!ParseTree class methodsFor: 'private' stamp: 'RMV 12/5/2024 19:00:11'!
-indentDepth: aNumber
-	^ self memoize: [
-		String new: aNumber * 4 withAll: Character space.
-	]! !
-
 !ParseTree class methodsFor: 'private' stamp: 'RMV 12/1/2024 09:04:25'!
 wordsFromCamelCase: aString
 	| stream |
@@ -208,34 +203,6 @@ wordsFromCamelCase: aString
 		stream nextPut: char asLowercase.
 	].
 	^stream contents.! !
-
-!Object methodsFor: '*CodeParse' stamp: 'RMV 12/8/2024 17:07:47'!
-memoize: aBlock
-	"Cache the result of evaluating a method with specific arguments.
-	This intended for use in class methods that only use their arguments.
-	For example, here is a memoized class method that
-	returns a String containing a number of spaces.
-	
-	indentDepth: aNumber
-	^ self memoize: [
-		String new: aNumber * 4 withAll: Character space.
-	]
-
-	To clear the cache for all methods in a given class, send
-	Object clearMemo: 'SomeClassName'
-	"
-	| cache cacheKey sender valueKey |
-	
-	sender := thisContext sender.
-	
-	"Smalltalk is a SystemDictionary which is an IdentityDictionary.
-	That is why cacheKey must be a Symbol."
-	cacheKey := ('memo-', sender name) asSymbol.
-
-	cache := Smalltalk at: cacheKey ifAbsentPut: [ IdentityDictionary new ].
-	valueKey := thisContext name, sender arguments asString :: asSymbol.
-
-	^ cache at: valueKey ifAbsentPut: [ aBlock value ].! !
 
 !Object class methodsFor: '*CodeParse' stamp: 'RMV 12/6/2024 06:12:34'!
 clearMemo: aString
@@ -474,14 +441,6 @@ lookupClassImplementingSelector: selectorSymbol
 		class := class superclass
 	].
 	^ nil! !
-
-!Integer methodsFor: '*CodeParse' stamp: 'RMV 12/8/2024 19:06:43'!
-fibonacci
-	"Answer fibonacci number for self."
-
-	self = 0 ifTrue: [ ^0 ].
-	self = 1 ifTrue: [ ^1 ].
-	^ (self - 1) fibonacci + (self - 2) fibonacci.! !
 
 !Integer class methodsFor: '*CodeParse' stamp: 'RMV 12/8/2024 19:07:02'!
 fibonacci: anInteger
