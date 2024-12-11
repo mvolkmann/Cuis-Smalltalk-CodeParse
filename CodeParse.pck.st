@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6883] on 10 December 2024 at 6:42:57 pm'!
+'From Cuis7.1 [latest update: #6883] on 10 December 2024 at 6:49:23 pm'!
 'Description '!
-!provides: 'CodeParse' 1 27!
+!provides: 'CodeParse' 1 28!
 !requires: 'Memoize' 1 1 nil!
 SystemOrganization addCategory: #CodeParse!
 
@@ -203,17 +203,6 @@ wordsFromCamelCase: aString
 		stream nextPut: char asLowercase.
 	].
 	^stream contents.! !
-
-!Object class methodsFor: '*CodeParse' stamp: 'RMV 12/6/2024 06:12:34'!
-clearMemo: aString
-	"Delete all memoized entries from Smalltalk Dictionary whose keys
-	begin with 'memo-' followed by a given string."
-	| prefix |
-	
-	prefix := 'memo-', aString.
-	Smalltalk keys do: [ :key |
-		key isSymbol and: [key asString beginsWith: prefix] :: ifTrue: [ Smalltalk removeKey: key ].
-	].! !
 
 !String methodsFor: '*CodeParse' stamp: 'RMV 12/1/2024 09:05:26'!
 wordsFromCamelCase
